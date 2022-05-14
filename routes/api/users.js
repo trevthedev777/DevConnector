@@ -7,9 +7,6 @@ const bcrypt = require('bcryptjs');
 // jsonewebtoken
 const jwt = require('jsonwebtoken');
 const config = require('config');
-const res = require('express/lib/response');
-
-
 const { check, validationResult } = require('express-validator');
 
 const User = require('../../models/User');
