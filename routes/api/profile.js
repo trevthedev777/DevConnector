@@ -1,6 +1,8 @@
 const express = require('express');
 const res = require('express/lib/response');
 
+const Profile = require('../../routes/api/')
+
 // To use the express router
 const router = express.Router();
 
