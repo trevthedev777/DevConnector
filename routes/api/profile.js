@@ -1,5 +1,6 @@
 const express = require('express');
-const { defaultProxyHeaderWhiteList } = require('request/request');
+const request = require('request');
+const config = require('config');
 // To use the express router
 const router = express.Router();
 const auth = require('../../middleware/auth');
@@ -7,9 +8,7 @@ const { check, validationResult } = require('express-validator');
 
 const Profile = require('../../models/Profile');
 const User = require('../../models/User');
-const { normalizeType } = require('express/lib/utils');
-const res = require('express/lib/response');
-
+const nodemon = require('nodemon');
 
 // @Route       GET api/profile/me
 // @description Get current users profile
@@ -216,7 +215,7 @@ router.put('/experience', [ auth, [
     };
 
     try {
-        
+
         const profile = await Profile.findOne({ user: req.user.id });
 
         profile.experience.unshift(newExp);
@@ -230,5 +229,112 @@ router.put('/experience', [ auth, [
         res.status(500).send('Server Error')
     }
 });
+
+// @Route       DELETE api/profile/experience/:exp_id
+// @description Delete Experience from Profile
+// @access      Private
+router.delete(
+    '/experience/:exp_id', auth, async (req, res) => {
+    try {
+        const profile = await Profile.findOne({ user: req.user.id });
+
+        // Get Remove Index
+        const removeIndex = profile.experience.map(item => item.id).indexOf(req.params.exp_id);
+
+        profile.experience.splice(removeIndex, 1);
+
+        await profile.save();
+
+        res.json(profile);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error')
+    }
+});
+
+// @route    PUT api/profile/education
+// @desc     Add profile education
+// @access   Private
+router.put(
+  '/education',
+  auth,
+  check('school', 'School is required').notEmpty(),
+  check('degree', 'Degree is required').notEmpty(),
+  check('fieldofstudy', 'Field of study is required').notEmpty(),
+  check('from', 'From date is required and needs to be from the past')
+    .notEmpty()
+    .custom((value, { req }) => (req.body.to ? value < req.body.to : true)),
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+      const profile = await Profile.findOne({ user: req.user.id });
+
+      profile.education.unshift(req.body);
+
+      await profile.save();
+
+      res.json(profile);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server Error');
+    }
+  }
+);
+
+// @route    DELETE api/profile/education/:edu_id
+// @desc     Delete education from profile
+// @access   Private
+
+router.delete(
+    '/education/:edu_id', auth, async (req, res) => {
+  try {
+    const foundProfile = await Profile.findOne({ user: req.user.id });
+    foundProfile.education = foundProfile.education.filter(
+      (edu) => edu._id.toString() !== req.params.edu_id
+    );
+    await foundProfile.save();
+    return res.status(200).json(foundProfile);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ msg: 'Server error' });
+  }
+});
+
+
+// @route    GET api/profile/github/:username
+// @desc     Get user repos from github
+// @access   Public
+
+router.get('/github/:username', (req, res) => {
+    try {
+
+        const options = {
+        uri: `https://api.github.com/users/${
+                req.params.username
+        }/repos?per_page=5&sort=created:asc&client_id=${config.get('githubClientId')}&client_secret=${config.get('githubSecret')}`,
+            method: 'GET',
+            headers: { 'user-agent': 'node.js' }
+        };
+
+        request(options, (error, response, body) => {
+
+            if (error) console.error(error);
+
+            if (response.statusCode !== 200) {
+                return res.status(404).json({ msg: 'No Github Profile Found' });
+            }
+
+            res.json(JSON.parse(body));
+
+        });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error, can not load github')
+    }
+})
 
 module.exports = router;
