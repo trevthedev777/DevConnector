@@ -1,7 +1,10 @@
 import React, { Fragment, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import { login } from '../../actions/auth';
 
-const Login = () => {
+const Login = ({ login, isAuthenticated }) => {
 
     // Set State for Login
     const [ formData, setFormData] = useState({
@@ -14,12 +17,21 @@ const Login = () => {
 
     // Change The Name state ONLY onChange
     // change so that it only happens on name declaration
-    const onChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
+    const onChange = e => setFormData({
+         ...formData, 
+         [e.target.name]: 
+         e.target.value });
 
     // Form Submit
     const onSubmit = async e => {
         e.preventDefault();
         console.log('SUCCESS');
+        login(email,password);
+    }
+
+    // Redirect if logged in
+    if (isAuthenticated) {
+        return <Navigate to="/dashboard" />
     }
 
   return (
@@ -71,4 +83,18 @@ const Login = () => {
   )
 };
 
-export default Login;
+// Proptypes
+Login.propTypes = {
+    Login: PropTypes.func.isRequired,
+    isAuthenticated: PropTypes.bool
+};
+
+// AUthenticated User redirected to login
+const mapStateToProps = state => ({
+    isAuthenticated: state.auth.isAuthenticated
+});
+
+export default connect(
+    mapStateToProps, 
+    { login }
+    )(Login);

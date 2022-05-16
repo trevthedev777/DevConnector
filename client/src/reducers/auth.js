@@ -1,5 +1,12 @@
 // Import Alerts
-import { REGISTER_SUCCESS, REGISTER_FAIL } from '../actions/types';
+import { 
+    REGISTER_SUCCESS, 
+    REGISTER_FAIL, 
+    USER_LOADED, 
+    AUTH_ERROR,
+    LOGIN_SUCCESS,
+    LOGIN_FAIL 
+} from '../actions/types';
 
 // The default state
 const initialState = {
@@ -14,10 +21,21 @@ export default function(state = initialState, action) {
     
     const { type, payload } = action;
     
-    switch(type) {
+    switch (type) {
+        // User Loaded
+        case USER_LOADED:
+            return {
+                ...state,
+                isAuthenticated: true,
+                loading: false,
+                user: payload
+            }
+
         // To load the user in on success
         case REGISTER_SUCCESS:
+        case LOGIN_SUCCESS:
             localStorage.setItem('token', payload.token);
+
         // The State we want to display
             return {
                 ...state, 
@@ -27,6 +45,8 @@ export default function(state = initialState, action) {
             }
         // When fail on loading
         case REGISTER_FAIL:
+        case AUTH_ERROR:
+        case LOGIN_FAIL:
             // Remove the token immediately
             localStorage.removeItem('token')
             return {
