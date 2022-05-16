@@ -24,7 +24,8 @@ router.post('/', [
     .isEmpty(),
 
     // email validation
-    check('email', 'Please include a valid email').isEmail(),
+    check('email', 'Please include a valid email')
+    .isEmail(),
 
     // Password Validator
     check('password', 'Please enter a password with 6 or more characters')

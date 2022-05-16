@@ -41,10 +41,76 @@ router.post(
     
     } catch (err) {
       console.error(err.message);
-      res.status(500).send('Server Error: Invalid Issues');
+      res.status(500).send('Server Error: Can not submit post');
     }
     
   }
 );
+
+// @Route       GET api/posts/:id
+// @description Get all posts
+// @access      Private
+
+router.get('/:id', auth, async (req, res) => {
+  try {
+    // this will display them in newest posts first
+    const post = await Post
+    .findById(req.params.id);
+
+    if  (!post) {
+      return res.status(404).json({ msg: 'Post not found' })
+    }
+    // Return 
+    res.json(post)
+  } catch (err) {
+    console.error(err.message);
+    if  (err.kind === 'ObjectId') {
+      return res.status(404).json({ msg: 'Post not found' })
+    }
+      res.status(500).send('Server Error: Can not load all posts');
+  }
+});
+
+// @Route       GET api/posts
+// @description Get all posts
+// @access      Private
+
+router.get('/', auth, async (req, res) => {
+  try {
+    // this will display them in newest posts first
+    const posts = await Post.find().sort({ date: -1 });
+    res.json(posts)
+  } catch (err) {
+    console.error(err.message);
+      res.status(500).send('Server Error: Can not load all posts');
+  }
+});
+
+// @Route       DELETE api/posts/:id
+// @description Delete a post
+// @access      Private
+
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    // this will display them in newest posts first
+    const posts = await Post.findbyId(req.params.id);
+
+    if  (!post) {
+      return res.status(404).json({ msg: 'Post not found' })
+    }
+
+    //  Check User
+    if (post.user.toString !== req.user.id) {
+      return res.status(41).json({ msg: 'User Not Authorized'});
+    };
+
+    await this.post.remove();
+
+    res.json(posts)
+  } catch (err) {
+    console.error(err.message);
+      res.status(500).send('Server Error: Can not load all posts');
+  }
+});
 
 module.exports = router;
