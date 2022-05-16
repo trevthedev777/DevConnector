@@ -64,7 +64,7 @@ const Login = () => {
 
             <p className="my-1">
                 Don't have an account? 
-                <Link to="/register">Sign Up</Link>
+                <Link to="/register"> Sign Up</Link>
             </p>
         </section>
     </Fragment>
