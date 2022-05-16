@@ -27,7 +27,9 @@
     "gravatar": "^1.8.2",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.3.3",
-    "request": "^2.88.2"
+    "request": "^2.88.2",
+    "switch": "^0.0.0",
+    "switch-react": "^1.2.1"
   },
   "devDependencies": {
     "concurrently": "^7.1.0",
