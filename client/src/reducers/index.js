@@ -1,6 +1,9 @@
 // Route Reducer
 import { combineReducers } from "redux";
 
-export default combineReducers({
+// reducers
+import alert from './alert';
 
+export default combineReducers({
+    alert
 });

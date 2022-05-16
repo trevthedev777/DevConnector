@@ -29,7 +29,8 @@
     "mongoose": "^6.3.3",
     "request": "^2.88.2",
     "switch": "^0.0.0",
-    "switch-react": "^1.2.1"
+    "switch-react": "^1.2.1",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "concurrently": "^7.1.0",
