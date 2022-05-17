@@ -1,65 +1,53 @@
-// Import Alerts
-import { 
-    REGISTER_SUCCESS, 
-    REGISTER_FAIL, 
-    USER_LOADED, 
-    AUTH_ERROR,
-    LOGIN_SUCCESS,
-    LOGIN_FAIL,
-    LOGOUT
+import {
+  REGISTER_SUCCESS,
+  //REGISTER_FAIL,
+  USER_LOADED,
+  AUTH_ERROR,
+  LOGIN_SUCCESS,
+  //LOGIN_FAIL,
+  LOGOUT,
+  ACCOUNT_DELETED
 } from '../actions/types';
 
-// The default state
 const initialState = {
-    // The Token is located in the localserver for this build
-    token: localStorage.getItem('token'),
-    isAuthenticated: null,
-    loading: true,
-    user: null
+  token: localStorage.getItem('token'),
+  isAuthenticated: null,
+  loading: true,
+  user: null
+};
+
+function authReducer(state = initialState, action) {
+  const { type, payload } = action;
+
+  switch (type) {
+    case USER_LOADED:
+      return {
+        ...state,
+        isAuthenticated: true,
+        loading: false,
+        user: payload
+      };
+    case REGISTER_SUCCESS:
+    case LOGIN_SUCCESS:
+      return {
+        ...state,
+        ...payload,
+        isAuthenticated: true,
+        loading: false
+      };
+    case ACCOUNT_DELETED:
+    case AUTH_ERROR:
+    case LOGOUT:
+      return {
+        ...state,
+        token: null,
+        isAuthenticated: false,
+        loading: false,
+        user: null
+      };
+    default:
+      return state;
+  }
 }
 
-function profileReducer(state = initialState, action) {
-    
-    const { type, payload } = action;
-    
-    switch (type) {
-        // User Loaded
-        case USER_LOADED:
-            return {
-                ...state,
-                isAuthenticated: true,
-                loading: false,
-                user: payload
-            }
-
-        // To load the user in on success
-        case REGISTER_SUCCESS:
-        case LOGIN_SUCCESS:
-            localStorage.setItem('token', payload.token);
-
-        // The State we want to display
-            return {
-                ...state, 
-                ...payload,
-                isAuthenticated: true,
-                loading: false
-            }
-        // When fail on loading
-        case REGISTER_FAIL:
-        case AUTH_ERROR:
-        case LOGIN_FAIL:
-        case LOGOUT:
-            // Remove the token immediately
-            localStorage.removeItem('token')
-            return {
-                ...state, 
-                token: null,
-                isAuthenticated: false,
-                loading: false
-            }
-        default:
-            return state;
-    }
-}
-
-export default profileReducer;
+export default authReducer;
