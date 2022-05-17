@@ -1,8 +1,15 @@
 import React from 'react'
 // To Avoid <a>
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
-const Landing = () => {
+const Landing = ({ isAuthenticated }) => {
+
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" />
+  }
+
   return (
     //   Landing Page
     <section className="landing">
@@ -23,6 +30,14 @@ const Landing = () => {
       </div>
     </section>
   )
+};
+
+Landing.propTypes = {
+  isAuthenticated: PropTypes.bool,
 }
 
-export default Landing
+const mapStateToProps = state => ({
+  isAuthenticated: state.auth.isAuthenticated
+})
+
+export default connect(mapStateToProps)(Landing);
